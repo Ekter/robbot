@@ -23,7 +23,6 @@ async def on_ready():
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
     print('------')
 
-
 @bot.command()
 async def add(ctx, left: int, right: int):
     """Adds two numbers together."""
@@ -76,5 +75,17 @@ async def _bot(ctx):
     """Is the bot cool?"""
     await ctx.send('Yes, the bot is cool.')
 
+@bot.command(name="addrole",aliases=["ar","+r"])
+async def addrole(ctx, member: discord.Member, role: discord.Role):
+    """Adds a role to a member."""
+    await member.add_roles(role)
+    await ctx.send(f'Added {role.name} to {member.name}')
+
+@bot.command(name="removerole",aliases=["rr","-r"])
+@commands.has_role("Admin")
+async def removerole(ctx, member: discord.Member, role: discord.Role):
+    """Removes a role from a member."""
+    await member.remove_roles(role)
+    await ctx.send(f'Removed {role.name} from {member.name}')
 
 bot.run(token)
