@@ -112,18 +112,18 @@ async def stats(ctx):
     await ctx.send("```"+df.to_string()+"```")
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
-@bot.command(name="addrole",aliases=["ar","+r"])
+@bot.command(name="addrole",aliases="+r")
 @commands.has_role("Admin")
 async def addrole(ctx, member: discord.Member, role: discord.Role):
-    """Adds a role to a member."""
+    """Ajoute un role."""
     await member.add_roles(role)
     await ctx.send(f'Added {role.name} to {member.name}')
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
-@bot.command(name="removerole",aliases=["rr","-r"])
+@bot.command(name="removerole",aliases="-r")
 @commands.has_role("Admin")
 async def removerole(ctx, member: discord.Member, role: discord.Role):
-    """Removes a role from a member."""
+    """Enleve un role."""
     await member.remove_roles(role)
     await ctx.send(f'Removed {role.name} from {member.name}')
 
