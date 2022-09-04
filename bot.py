@@ -54,7 +54,7 @@ async def ajoute(ctx:commands.context.Context, left: int, right: int):
 
 
 @bot.command()
-async def lance(ctx, dice: str):
+async def lance(ctx:commands.context.Context, dice: str):
     """Lance des dés, au format NdN."""
     try:
         rolls, limit = map(int, dice.split('d'))
@@ -67,37 +67,37 @@ async def lance(ctx, dice: str):
 
 
 @bot.command(description="Choix aléatoire parmi une liste")
-async def choose(ctx, *choices: str):
+async def choose(ctx:commands.context.Context, *choices: str):
     """Chooses between multiple choices."""
     await ctx.send(random.choice(choices))
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command()
-async def ben(ctx):
+async def ben(ctx: commands.context.Context):
     """Ben."""
     await ctx.send(random.choice(["Oui","Non","Peut-être","Arghh"]))
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command()
-async def repete(ctx, times: int=5, content='-Pete et Repete sont sur un bateau... Pete tombe à l\'eau, qui il reste?   -Repete!'):
+async def repete(ctx:commands.context.Context, times: int=5, content='-Pete et Repete sont sur un bateau... Pete tombe à l\'eau, qui il reste?   -Repete!'):
     """Repete un message plusieurs fois."""
     for i in range(times):
         await ctx.send(content)
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command(name="exec")
-async def exec_(ctx,command:str):
+async def exec_(ctx:commands.context.Context,command:str):
     r"""Execute une commande(ex:"random.randint(0,10)", ou "\"abc\".upper()"). Faites pas crash le bot!"""
-    await ctx.send("Executing command: "+command)
+    await ctx.send("J'execute: `"+command+"`")
     try:
         await ctx.send("Output: "+str(eval(command)))
         await ctx.message.add_reaction(REACTION_WHEN_DONE)
     except Exception as e:
-        await ctx.send("You made me crash! Here's the error: "+str(e))
+        await ctx.send("Le processus a crash! Erreur: "+str(e))
         await ctx.message.add_reaction("❌")
 
 @bot.command()
-async def joined(ctx, member: discord.Member):
+async def joined(ctx:commands.context.Context, member: discord.Member):
     """Dit quand un membre a rejoint le serveur."""
     try:
         await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
@@ -105,16 +105,16 @@ async def joined(ctx, member: discord.Member):
     except Exception as e:
         await ctx.message.add_reaction("❌")
 
-@bot.command(name="stats")
-async def stats(ctx):
-    """Donne les stats actuelles"""
-    df=pd.read_csv("data.csv")
-    await ctx.send("```"+df.to_string()+"```")
-    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+# @bot.command(name="stats")
+# async def stats(ctx):
+#     """Donne les stats actuelles"""
+#     df=pd.read_csv("data.csv")
+#     await ctx.send("```"+df.to_string()+"```")
+#     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command(name="addrole",aliases="+r")
 @commands.has_role("Admin")
-async def addrole(ctx, member: discord.Member, role: discord.Role):
+async def addrole(ctx:commands.context.Context, member: discord.Member, role: discord.Role):
     """Ajoute un role."""
     await member.add_roles(role)
     await ctx.send(f'Added {role.name} to {member.name}')
@@ -122,7 +122,7 @@ async def addrole(ctx, member: discord.Member, role: discord.Role):
 
 @bot.command(name="removerole",aliases="-r")
 @commands.has_role("Admin")
-async def removerole(ctx, member: discord.Member, role: discord.Role):
+async def removerole(ctx:commands.context.Context, member: discord.Member, role: discord.Role):
     """Enleve un role."""
     await member.remove_roles(role)
     await ctx.send(f'Removed {role.name} from {member.name}')
