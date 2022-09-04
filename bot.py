@@ -7,7 +7,8 @@ from settings import *
 
 
 description = '''Bot pour le serv discord de robotique de PNS'''
-with open("whatisthis.txt","r") as f:
+with open("../whatisthis.txt","r") as f:
+    token=f.readline()
     token=base64.b64decode(f.readline()).decode("utf-8")
 
 intents = discord.Intents.default()
@@ -103,6 +104,13 @@ async def joined(ctx, member: discord.Member):
         await ctx.message.add_reaction(REACTION_WHEN_DONE)
     except Exception as e:
         await ctx.message.add_reaction("❌")
+
+@bot.command(name="stats")
+async def stats(ctx):
+    """Donne les stats actuelles"""
+    df=pd.read_csv("data.csv")
+    await ctx.send("```"+df.to_string()+"```")
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command(name="addrole",aliases=["ar","+r"])
 @commands.has_role("Admin")
