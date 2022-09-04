@@ -68,7 +68,7 @@ async def lance(ctx:commands.context.Context, dice: str):
 
 @bot.command(description="Choix aléatoire parmi une liste")
 async def choose(ctx:commands.context.Context, *choices: str):
-    """Chooses between multiple choices."""
+    """Choix aléatoire parmi une liste."""
     await ctx.send(random.choice(choices))
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
@@ -86,7 +86,7 @@ async def repete(ctx:commands.context.Context, times: int=5, content='-Pete et R
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
 @bot.command(name="exec")
-async def exec_(ctx:commands.context.Context,command:str):
+async def eval_(ctx:commands.context.Context,command:str):
     r"""Execute une commande(ex:"random.randint(0,10)", ou "\"abc\".upper()"). Faites pas crash le bot!"""
     await ctx.send("J'execute: `"+command+"`")
     try:
