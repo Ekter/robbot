@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import base64
-import pandas as pd
+# import pandas as pd
 from settings import *
 
 
