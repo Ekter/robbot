@@ -1,30 +1,122 @@
-import base64
-from discord.ext import commands
 import discord
+from discord.ext import commands
+import random
+import base64
+import pandas as pd
+from settings import *
 
 
+description = '''Bot pour le serv discord de robotique de PNS'''
 with open("whatisthis.txt","r") as f:
     token=base64.b64decode(f.readline()).decode("utf-8")
 
-intents = discord.Intents(members=True,messages=True,reactions=True)
-bot = commands.Bot(command_prefix=["robbot", "rb"], intents=discord.Intents.all())
+intents = discord.Intents.default()
+intents.members = True
+intents.message_content = True
+intents.reactions = True
+
+bot = commands.Bot(command_prefix=PREFIX, description=description, intents=intents)
+
 
 @bot.event
 async def on_ready():
-    print(f"{bot.user.name} has connected to Discord!")
+    print(f'Logged in as {bot.user}')
+    print('------')
 
-@bot.command(name="color", aliases=["colour"])
-async def color(ctx, *, color: discord.Color):
-    """
-    Sets the color of the embed.
-    """
-    print("a")
-    await ctx.send("a")
-    embed = discord.Embed(color=color)
-    await ctx.send(embed=embed)
+@bot.event
+async def on_message(message:commands.context.Context):
+    df=pd.read_csv("data.csv")
+    print(df)
+    print(message.author.name)
+    if message.author.name in df["user"].values:
+        df.loc[df["user"]==message.author.name,"messages"]+=1
+    else:
+        df.loc[len(df)]=[message.author.name,1,0]
+    df.to_csv("data.csv",index=False)
 
-@bot.command(name="ping")
-async def some_crazy_function_name(ctx):
-	await ctx.channel.send("pong")
+@bot.event
+async def on_raw_reaction_add(payload:discord.RawReactionActionEvent):
+    df=pd.read_csv("data.csv")
+    print(df)
+    print(payload.member.name)
+    if payload.member.name in df["user"].values:
+        df.loc[df["user"]==payload.member.name,"reactions"]+=1
+    else:
+        df.loc[len(df)]=[payload.member.name,0,1]
+    df.to_csv("data.csv",index=False)
+
+@bot.command()
+async def ajoute(ctx:commands.context.Context, left: int, right: int):
+    """Ajoute deux nombres ensemble, si jamais vous avez un trou de mémoire."""
+    await ctx.send(str(left + right))
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+
+@bot.command()
+async def lance(ctx, dice: str):
+    """Lance des dés, au format NdN."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('Vérifiez le format! ça doit être NdN.')
+        return
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+
+@bot.command(description="Choix aléatoire parmi une liste")
+async def choose(ctx, *choices: str):
+    """Chooses between multiple choices."""
+    await ctx.send(random.choice(choices))
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+@bot.command()
+async def ben(ctx):
+    """Ben."""
+    await ctx.send(random.choice(["Oui","Non","Peut-être","Arghh"]))
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+@bot.command()
+async def repete(ctx, times: int=5, content='-Pete et Repete sont sur un bateau... Pete tombe à l\'eau, qui il reste?   -Repete!'):
+    """Repete un message plusieurs fois."""
+    for i in range(times):
+        await ctx.send(content)
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+@bot.command(name="exec")
+async def exec_(ctx,command:str):
+    r"""Execute une commande(ex:"random.randint(0,10)", ou "\"abc\".upper()"). Faites pas crash le bot!"""
+    await ctx.send("Executing command: "+command)
+    try:
+        await ctx.send("Output: "+str(eval(command)))
+        await ctx.message.add_reaction(REACTION_WHEN_DONE)
+    except Exception as e:
+        await ctx.send("You made me crash! Here's the error: "+str(e))
+        await ctx.message.add_reaction("❌")
+
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    """Dit quand un membre a rejoint le serveur."""
+    try:
+        await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+        await ctx.message.add_reaction(REACTION_WHEN_DONE)
+    except Exception as e:
+        await ctx.message.add_reaction("❌")
+
+@bot.command(name="addrole",aliases=["ar","+r"])
+@commands.has_role("Admin")
+async def addrole(ctx, member: discord.Member, role: discord.Role):
+    """Adds a role to a member."""
+    await member.add_roles(role)
+    await ctx.send(f'Added {role.name} to {member.name}')
+    await ctx.message.add_reaction(REACTION_WHEN_DONE)
+
+@bot.command(name="removerole",aliases=["rr","-r"])
+@commands.has_role("Admin")
+async def removerole(ctx, member: discord.Member, role: discord.Role):
+    """Removes a role from a member."""
+    await member.remove_roles(role)
+    await ctx.send(f'Removed {role.name} from {member.name}')
 
 bot.run(token)
