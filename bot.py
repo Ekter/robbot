@@ -9,7 +9,7 @@ from settings import *
 description = '''Bot pour le serv discord de robotique de PNS'''
 with open("../whatisthis.txt","r") as f:
     token=f.readline()
-    token=base64.b64decode(f.readline()).decode("utf-8")
+    # token=base64.b64decode(f.readline()).decode("utf-8")
 
 intents = discord.Intents.default()
 intents.members = True
@@ -24,31 +24,31 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     print('------')
 
-@bot.event
-async def on_message(message:commands.context.Context):
-    df=pd.read_csv("data.csv")
-    print(df)
-    print(message.author.name)
-    if message.author.name in df["user"].values:
-        df.loc[df["user"]==message.author.name,"messages"]+=1
-    else:
-        df.loc[len(df)]=[message.author.name,1,0]
-    df.to_csv("data.csv",index=False)
+# @bot.event
+# async def on_message(message:commands.context.Context):
+#     df=pd.read_csv("data.csv")
+#     print(df)
+#     print(message.author.name)
+#     if message.author.name in df["user"].values:
+#         df.loc[df["user"]==message.author.name,"messages"]+=1
+#     else:
+#         df.loc[len(df)]=[message.author.name,1,0]
+#     df.to_csv("data.csv",index=False)
 
-@bot.event
-async def on_raw_reaction_add(payload:discord.RawReactionActionEvent):
-    df=pd.read_csv("data.csv")
-    print(df)
-    print(payload.member.name)
-    if payload.member.name in df["user"].values:
-        df.loc[df["user"]==payload.member.name,"reactions"]+=1
-    else:
-        df.loc[len(df)]=[payload.member.name,0,1]
-    df.to_csv("data.csv",index=False)
+# @bot.event
+# async def on_raw_reaction_add(payload:discord.RawReactionActionEvent):
+#     df=pd.read_csv("data.csv")
+#     print(df)
+#     print(payload.member.name)
+#     if payload.member.name in df["user"].values:
+#         df.loc[df["user"]==payload.member.name,"reactions"]+=1
+#     else:
+#         df.loc[len(df)]=[payload.member.name,0,1]
+#     df.to_csv("data.csv",index=False)
 
 @bot.command()
 async def ajoute(ctx:commands.context.Context, left: int, right: int):
-    """Ajoute deux nombres ensemble, si jamais vous avez un trou de mémoire."""
+    """Ajoute deux nombres ensemble, si jamais vous avez la flemme de le calculer vous même."""
     await ctx.send(str(left + right))
     await ctx.message.add_reaction(REACTION_WHEN_DONE)
 
